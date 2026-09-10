@@ -87,8 +87,20 @@ class Enforcer:
         self.auto_opened = False
 
     def run(self):
-        if not bar_open():
-            toggle()
+        empty = is_empty()
+        if empty is None:
+            return  # backend hiccup: touch nothing
+        if empty:
+            if not bar_open():
+                toggle()
+            self.auto_opened = True
+        else:
+            if bar_open():
+                if self.auto_opened:
+                    toggle()
+                    self.auto_opened = False
+            else:
+                self.auto_opened = False
 
 
 def main():
