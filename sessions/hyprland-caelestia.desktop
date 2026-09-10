@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Hyprland (Caelestia)
+Comment=Hyprland with Sidera/Caelestia shell
+Exec=/home/sriyaan/.local/bin/start-hyprland-caelestia
+Type=Application
+DesktopNames=Hyprland
+Keywords=tiling;wayland;compositor;

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Login entry: Hyprland + Sidera/Caelestia shell.
+export HYPR_SHELL=caelestia
+systemctl --user stop dms.service 2>/dev/null || true
+pkill -f 'quickshell/dms' 2>/dev/null || true
+pkill -f '/usr/share/quickshell/dms' 2>/dev/null || true
+exec /usr/bin/start-hyprland

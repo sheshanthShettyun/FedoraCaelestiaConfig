@@ -1,0 +1,96 @@
+{
+    "appearance": {
+        "font": {
+            "mono": {
+                "family": "Cascadia Code NF"
+            }
+        },
+        "transparency": {
+            "enabled": false
+        }
+    },
+    "background": {
+        "wallpaperEnabled": true
+    },
+    "bar": {
+        "clock": {
+            "background": false,
+            "showDate": true
+        },
+        "persistent": false,
+        "scrollActions": {
+            "workspaces": true
+        },
+        "showOnHover": true,
+        "tray": {
+            "background": false,
+            "compact": false,
+            "recolour": false
+        },
+        "workspaces": {
+            "activeIndicator": true,
+            "activeTrail": false,
+            "occupiedBg": false,
+            "perMonitorWorkspaces": true,
+            "showWindows": true,
+            "showWindowsOnSpecialWorkspaces": true,
+            "shown": 3
+        }
+    },
+    "border": {
+        "rounding": 8,
+        "thickness": 6
+    },
+    "dashboard": {
+        "enabled": true,
+        "showOnHover": true
+    },
+    "general": {
+        "apps": {
+            "explorer": [
+                "nautilus"
+            ],
+            "terminal": [
+                "ghostty"
+            ]
+        }
+    },
+    "launcher": {
+        "showOnHover": false
+    },
+    "sidebar": {
+        "enabled": true
+    },
+    "utilities": {
+        "quickToggles": [
+            {
+                "enabled": true,
+                "id": "wifi"
+            },
+            {
+                "enabled": true,
+                "id": "bluetooth"
+            },
+            {
+                "enabled": true,
+                "id": "mic"
+            },
+            {
+                "enabled": true,
+                "id": "settings"
+            },
+            {
+                "enabled": true,
+                "id": "gameMode"
+            },
+            {
+                "enabled": true,
+                "id": "dnd"
+            },
+            {
+                "enabled": false,
+                "id": "vpn"
+            }
+        ]
+    }
+}

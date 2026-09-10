@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""Keep Sidera bar visible on empty workspaces, hover-reveal on busy ones.
+
+STRICT mode: listens to Hyprland's event socket (workspace switch, window
+open/close/move) and enforces instantly instead of polling. A slow 15s
+backstop poll heals anything missed.
+
+- Empty ws  -> ensure bar open (records autoOpened=True)
+- Busy ws    -> close only if WE opened it (never fights manual toggles)
+
+Single instance via lockfile. Removal: delete this file + the
+`sidera-emptyws-barwatcher` line in hyprland.lua.
+"""
+import json
+import os
+import select
+import subprocess
+import sys
+import time
+
+UID = os.getuid()
+LOCK = f"/run/user/{UID}/sidera-emptyws-bar.lock"
+POLL_BACKSTOP = 15.0
+SETTLE_OPEN = 0.15  # let Hyprland finish mapping a new window before counting
+SETTLE_OTHER = 0.05  # switch/close/move counts are valid immediately
+
+EVENTS = (
+    "workspacev2>>",
+    "workspace>>",
+    "openwindowv2>>",
+    "openwindow>>",
+    "closewindow>>",
+    "movewindowv2>>",
+    "movewindow>>",
+)
+
+
+def sh(*args, timeout=10):
+    try:
+        return subprocess.run(
+            list(args), capture_output=True, text=True, timeout=timeout
+        ).stdout.strip()
+    except Exception:
+        return ""
+
+
+def find_socket():
+    sig = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
+    rtdir = os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{UID}")
+    if sig:
+        p = os.path.join(rtdir, "hypr", sig, ".socket2.sock")
+        if os.path.exists(p):
+            return p
+    try:
+        base = os.path.join(rtdir, "hypr")
+        cands = []
+        for d in os.listdir(base):
+            p = os.path.join(base, d, ".socket2.sock")
+            if os.path.exists(p):
+                cands.append((os.path.getmtime(p), p))
+        if cands:
+            return sorted(cands)[-1][1]
+    except Exception:
+        pass
+    return None
+
+
+def is_empty():
+    try:
+        wins = json.loads(sh("hyprctl", "activeworkspace", "-j")).get("windows", 1)
+        n = len(wins) if isinstance(wins, list) else int(wins)
+        return n == 0
+    except Exception:
+        return None
+
+
+def bar_open():
+    return sh("caelestia", "shell", "drawers", "isOpen", "bar") in ("1", "true")
+
+
+def toggle():
+    sh("caelestia", "shell", "drawers", "toggle", "bar")
+
+
+class Enforcer:
+    def __init__(self):
+        self.auto_opened = False
+
+    def run(self):
+        empty = is_empty()
+        if empty is None:
+            return  # backend hiccup: touch nothing
+        if empty:
+            if not bar_open():
+                toggle()
+            self.auto_opened = True
+        else:
+            if bar_open():
+                if self.auto_opened:
+                    toggle()
+                    self.auto_opened = False
+            else:
+                self.auto_opened = False
+
+
+def main():
+    try:
+        fd = os.open(LOCK, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        os.write(fd, str(os.getpid()).encode())
+    except FileExistsError:
+        sys.exit(0)  # already running
+
+    enforcer = Enforcer()
+    enforcer.run()  # settle initial state immediately
+    last_backstop = time.monotonic()
+
+    while True:
+        sock = find_socket()
+        if sock is None:
+            time.sleep(2)
+            continue
+        try:
+            proc = subprocess.Popen(
+                ["socat", "-U", "-", f"UNIX-CONNECT:{sock}"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+                bufsize=1,
+            )
+        except Exception:
+            time.sleep(2)
+            continue
+        try:
+            while True:
+                # backstop heal while listening
+                if time.monotonic() - last_backstop > POLL_BACKSTOP:
+                    enforcer.run()
+                    last_backstop = time.monotonic()
+                ready, _, _ = select.select([proc.stdout], [], [], 2.0)
+                if not ready:
+                    continue
+                line = proc.stdout.readline()
+                if not line:  # socket died -> reconnect
+                    break
+                if line.startswith(EVENTS):
+                    settle = (
+                        SETTLE_OPEN
+                        if line.startswith(("openwindowv2>>", "openwindow>>"))
+                        else SETTLE_OTHER
+                    )
+                    time.sleep(settle)
+                    # drain burst (non-blocking, no extra delay)
+                    while select.select([proc.stdout], [], [], 0)[0]:
+                        proc.stdout.readline()
+                    enforcer.run()
+                    last_backstop = time.monotonic()
+        finally:
+            try:
+                proc.kill()
+            except Exception:
+                pass
+        time.sleep(1)  # reconnect backoff
+
+
+if __name__ == "__main__":
+    main()

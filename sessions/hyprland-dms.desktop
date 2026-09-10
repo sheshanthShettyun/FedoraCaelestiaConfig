@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Hyprland (DMS)
+Comment=Hyprland with DankMaterialShell
+Exec=/home/sriyaan/.local/bin/start-hyprland-dms
+Type=Application
+DesktopNames=Hyprland
+Keywords=tiling;wayland;compositor;

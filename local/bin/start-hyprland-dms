@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Login entry: Hyprland + DMS (original setup).
+export HYPR_SHELL=dms
+pkill -f 'quickshell/caelestia' 2>/dev/null || true
+systemctl --user start dms.service 2>/dev/null || true
+exec /usr/bin/start-hyprland

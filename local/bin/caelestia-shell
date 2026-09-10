@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -e
+export PATH="$HOME/.local/bin${PATH:+:$PATH}"
+export CAELESTIA_LIB_DIR="$HOME/.local/lib64/caelestia"
+export QML2_IMPORT_PATH="$HOME/.local/lib64/qt6/qml${QML2_IMPORT_PATH:+:$QML2_IMPORT_PATH}"
+exec qs -p "$HOME/.config/quickshell/caelestia" "$@"
