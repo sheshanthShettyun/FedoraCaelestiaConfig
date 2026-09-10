@@ -58,6 +58,10 @@
     "launcher": {
         "showOnHover": false
     },
+    "paths": {
+        "mediaGif": "/home/sriyaan/Pictures/media.gif",
+        "sessionGif": "/home/sriyaan/Pictures/session.gif"
+    },
     "sidebar": {
         "enabled": true
     },
