@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Check if an ADB device (USB or Wi-Fi) is currently connected
+if adb devices | grep -w "device" | grep -v "List of" >/dev/null 2>&1; then
+    exec scrcpy
+fi
+
+# Auto-reconnect via mDNS wireless-debug discovery (pairing already trusted,
+# no phone interaction needed as long as wireless debugging is switched on)
+adb mdns services 2>/dev/null | tail -n +2 | awk '{print $1}' | grep -vE '^\s*$' | while IFS= read -r svc; do
+    if adb connect "${svc}._adb-tls-connect._tcp" 2>/dev/null | grep -qE "^(already )?connected to"; then
+        break
+    fi
+done
+
+if adb devices | grep -w "device" | grep -v "List of" >/dev/null 2>&1; then
+    exec scrcpy
+fi
+
+# Try extracting IP from kdeconnect-cli
+PHONE_IP=$(kdeconnect-cli -a 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
+
+if [ -n "$PHONE_IP" ]; then
+    # Attempt common ADB ports
+    for PORT in 5555 40135 37000 38000 39000 40000 41000 42000 43000 44000 45000; do
+        if adb connect "${PHONE_IP}:${PORT}" 2>/dev/null | grep -qE "^(already )?connected to"; then
+            exec scrcpy
+        fi
+    done
+fi
+
+# Final fallback: execute scrcpy directly
+exec scrcpy

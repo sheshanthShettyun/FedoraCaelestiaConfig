@@ -1,0 +1,61 @@
+#!/bin/bash
+# List active phone notifications as unit-separator-separated lines:
+#   pkg \x1f appLabel \x1f title \x1f text \x1f whenMs
+# Skips foreground-service noise and local test posts.
+ADB=/home/sriyaan/platform-tools/adb
+
+app_label() {
+    case "$1" in
+        com.google.android.apps.messaging) echo "Messages" ;;
+        com.whatsapp) echo "WhatsApp" ;;
+        org.telegram.messenger) echo "Telegram" ;;
+        com.discord) echo "Discord" ;;
+        com.google.android.gm) echo "Gmail" ;;
+        com.google.android.dialer|com.android.dialer) echo "Phone" ;;
+        com.spotify.music) echo "Spotify" ;;
+        com.google.android.apps.photos) echo "Photos" ;;
+        com.oneplus.camera|com.oplus.camera|com.android.camera2) echo "Camera" ;;
+        com.google.android.calendar|com.oneplus.deskclock) echo "Calendar" ;;
+        com.google.android.apps.maps) echo "Maps" ;;
+        com.android.chrome|com.brave.browser) echo "Browser" ;;
+        com.google.android.youtube) echo "YouTube" ;;
+        in.swiggy.android) echo "Swiggy" ;;
+        com.zerodha.kite3) echo "Kite" ;;
+        com.linkedin.android) echo "LinkedIn" ;;
+        notion.id) echo "Notion" ;;
+        com.anthropic.claude) echo "Claude" ;;
+        com.openai.chatgpt) echo "ChatGPT" ;;
+        org.kde.kdeconnect_tp) echo "KDE Connect" ;;
+        com.android.systemui) echo "System" ;;
+        android) echo "System" ;;
+        *) # prettify last package segment
+            echo "$1" | awk -F. '{print $NF}' | sed -E 's/_/ /g;s/\b(.)/\U\1/g' ;;
+    esac
+}
+
+$ADB shell cmd notification list 2>/dev/null | tr -d '\r' | grep -vE '^\s*$' | head -14 | while IFS= read -r key; do
+    [ -z "$key" ] && continue
+    rec=$($ADB shell "cmd notification get '$key'" 2>/dev/null < /dev/null)
+    [ -z "$rec" ] && continue
+    pkg=$(echo "$rec" | grep -m1 'NotificationRecord' | grep -oP 'pkg=\K\S+')
+    [ -z "$pkg" ] && continue
+    # skip local test posts + foreground-service / persistent noise
+    [ "$pkg" = "com.android.shell" ] && continue
+    flags=$(echo "$rec" | grep -m1 -oP '^\s*flags=\K0x[0-9a-fA-F]+')
+    if [ -n "$flags" ]; then
+        dec=$((flags))
+        [ $((dec & 64)) -ne 0 ] && continue
+    fi
+    [ "$(echo "$rec" | grep -m1 -oP 'android\.isGroupSummary=Boolean \(\K(true|false)')" = "true" ] && continue
+    title=$(echo "$rec" | grep -m1 -oP 'android\.title=String \(\K.*(?=\)$)')
+    sub=$(echo "$rec" | grep -m1 -oP 'android\.subText=String \(\K.*(?=\)$)')
+    text=$(echo "$rec" | grep -m1 -oP 'android\.text=String \(\K.*(?=\)$)')
+    big=$(echo "$rec" | grep -m1 -oP 'android\.bigText=String \(\K.*(?=\)$)')
+    [ -z "$title" ] && title="$sub"
+    [ -z "$text" ] && text="$big"
+    [ -z "$title" ] && [ -z "$text" ] && continue
+    when=$(echo "$rec" | grep -m1 -oP '^\s*when=\K[0-9]+')
+    [ -z "$when" ] && when=0
+    label=$(app_label "$pkg")
+    printf '%s\x1f%s\x1f%s\x1f%s\x1f%s\n' "$pkg" "$label" "$title" "$text" "$when"
+done
