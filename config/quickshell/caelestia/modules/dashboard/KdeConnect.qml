@@ -137,7 +137,7 @@ Item {
                 Layout.preferredWidth: 1
             }
 
-            MemoryCard {
+            BatteryTank {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
             }
@@ -338,7 +338,7 @@ Item {
         StyledRect {
             Layout.fillWidth: true
             Layout.preferredWidth: 1.1
-            implicitHeight: 520
+            Layout.fillHeight: true
             radius: Tokens.rounding.extraExtraLarge
             color: Colours.tPalette.m3surfaceContainer
 
@@ -543,13 +543,11 @@ Item {
                         color: "#000000"
                     }
 
-                    // Screen Artwork Text
-                    StyledText {
+                    MaterialIcon {
                         anchors.centerIn: parent
-                        text: "Never\nSettle"
-                        font: Tokens.font.title.medium
-                        color: Qt.rgba(1, 1, 1, 0.85)
-                        horizontalAlignment: Text.AlignHCenter
+                        text: "smartphone"
+                        fontStyle: Tokens.font.icon.builders.extraLarge.scale(2.0).build()
+                        color: Colours.palette.m3primary
                     }
                 }
             }
