@@ -652,7 +652,7 @@ Item {
         required property string title
         required property string subtitle
 
-        type: ButtonBase.Tonal
+        type: ButtonBase.Text
         implicitWidth: 1
         implicitHeight: 56
         Layout.fillWidth: true
