@@ -103,12 +103,6 @@ Item {
                             font: Tokens.font.body.medium
                             color: Colours.palette.m3onSurface
                         }
-
-                        MaterialIcon {
-                            text: "arrow_drop_down"
-                            fontStyle: Tokens.font.icon.small
-                            color: Colours.palette.m3onSurfaceVariant
-                        }
                     }
                 }
             }
@@ -333,30 +327,40 @@ Item {
 
                 // Left Phone Frame
                 StyledRect {
-                    implicitWidth: 100
-                    implicitHeight: 160
-                    radius: Tokens.rounding.large
+                    implicitWidth: 90
+                    implicitHeight: 150
+                    radius: 16
                     color: Colours.tPalette.m3surfaceContainerHigh
-                    border.width: 1
+                    border.width: 1.5
                     border.color: Colours.palette.m3outlineVariant
 
                     ColumnLayout {
                         anchors.centerIn: parent
-                        spacing: Tokens.spacing.small
+                        spacing: 4
+
+                        // Phone Top Speaker Speaker Bar
+                        StyledRect {
+                            Layout.alignment: Qt.AlignHCenter
+                            implicitWidth: 24
+                            implicitHeight: 3
+                            radius: 1.5
+                            color: Colours.palette.m3outlineVariant
+                        }
 
                         MaterialIcon {
                             Layout.alignment: Qt.AlignHCenter
                             text: "smartphone"
-                            fontStyle: Tokens.font.icon.extraLarge
+                            fontStyle: Tokens.font.icon.builders.extraLarge.scale(1.4).build()
                             color: Colours.palette.m3primary
                         }
 
                         StyledText {
                             Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("Device\nImage")
+                            text: card.deviceName
                             font: Tokens.font.body.small
                             color: Colours.palette.m3onSurfaceVariant
-                            horizontalAlignment: Text.AlignHCenter
+                            elide: Text.ElideRight
+                            Layout.maximumWidth: 70
                         }
                     }
                 }
@@ -412,7 +416,7 @@ Item {
                         spacing: Tokens.spacing.medium
 
                         StatusTile {
-                            icon: "battery_charging_full"
+                            icon: "battery_full"
                             title: qsTr("87%")
                             subtext: qsTr("Charging")
                         }
@@ -454,7 +458,7 @@ Item {
                         IconTextButton {
                             Layout.fillWidth: true
                             type: IconTextButton.Tonal
-                            icon: "extension"
+                            icon: "tune"
                             text: qsTr("Plugins")
                             onClicked: root.openDeviceSettings(card.deviceId)
                         }
@@ -505,14 +509,14 @@ Item {
                     }
 
                     ToolRowItem {
-                        icon: "play_circle"
+                        icon: "play_arrow"
                         title: qsTr("Media")
                         subtitle: qsTr("Control playback")
                         onClicked: root.openDeviceSettings(card.deviceId)
                     }
 
                     ToolRowItem {
-                        icon: "keyboard_mouse"
+                        icon: "keyboard"
                         title: qsTr("Input")
                         subtitle: qsTr("Keyboard & mouse")
                         onClicked: root.openDeviceSettings(card.deviceId)
@@ -563,28 +567,28 @@ Item {
                     }
 
                     ToolRowItem {
-                        icon: "screencast"
+                        icon: "desktop_windows"
                         title: qsTr("Mirror")
                         subtitle: qsTr("View and control your screen")
                         onClicked: Quickshell.execDetached(["scrcpy"])
                     }
 
                     ToolRowItem {
-                        icon: "folder_open"
+                        icon: "folder"
                         title: qsTr("Browse")
                         subtitle: qsTr("Access files and folders")
                         onClicked: root.browseDevice(card.deviceId)
                     }
 
                     ToolRowItem {
-                        icon: "content_paste_go"
+                        icon: "content_paste"
                         title: qsTr("Clipboard")
                         subtitle: qsTr("Sync clipboard between devices")
                         onClicked: root.runDeviceAction(card.deviceId, "--send-clipboard")
                     }
 
                     ToolRowItem {
-                        icon: "terminal"
+                        icon: "code"
                         title: qsTr("Commands")
                         subtitle: qsTr("Run device commands")
                         onClicked: root.runDeviceAction(card.deviceId, "--list-commands")
