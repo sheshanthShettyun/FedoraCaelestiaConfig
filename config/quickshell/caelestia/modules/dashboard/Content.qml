@@ -204,7 +204,9 @@ Item {
             Component {
                 id: connectComponent
 
-                KdeConnect {}
+                KdeConnect {
+                    screenState: root.screenState
+                }
             }
 
             Behavior on contentX {

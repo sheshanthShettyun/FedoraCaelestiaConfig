@@ -13,6 +13,7 @@ import qs.services
 Item {
     id: root
 
+    property ScreenState screenState
     property bool loading
     property bool available
     property string statusText: qsTr("Checking KDE Connect...")
@@ -406,7 +407,7 @@ Item {
                             type: IconButton.Tonal
                             icon: "more_vert"
                             isRound: true
-                            onClicked: root.openDeviceSettings(card.deviceId)
+                            onClicked: root.refresh()
                         }
                     }
 
@@ -460,7 +461,7 @@ Item {
                             type: IconTextButton.Tonal
                             icon: "tune"
                             text: qsTr("Plugins")
-                            onClicked: root.openDeviceSettings(card.deviceId)
+                            onClicked: root.refresh()
                         }
                     }
                 }
@@ -512,21 +513,24 @@ Item {
                         icon: "play_arrow"
                         title: qsTr("Media")
                         subtitle: qsTr("Control playback")
-                        onClicked: root.openDeviceSettings(card.deviceId)
+                        onClicked: {
+                            if (root.screenState)
+                                root.screenState.dashboardTab = 1;
+                        }
                     }
 
                     ToolRowItem {
                         icon: "keyboard"
                         title: qsTr("Input")
                         subtitle: qsTr("Keyboard & mouse")
-                        onClicked: root.openDeviceSettings(card.deviceId)
+                        onClicked: root.runDeviceAction(card.deviceId, "--send-clipboard")
                     }
 
                     ToolRowItem {
                         icon: "sms"
                         title: qsTr("SMS")
                         subtitle: qsTr("Send & manage messages")
-                        onClicked: root.openDeviceSettings(card.deviceId)
+                        onClicked: root.runDeviceAction(card.deviceId, "--ping-msg 'KDE Connect active'")
                     }
                 }
             }
@@ -570,7 +574,7 @@ Item {
                         icon: "desktop_windows"
                         title: qsTr("Mirror")
                         subtitle: qsTr("View and control your screen")
-                        onClicked: Quickshell.execDetached(["scrcpy"])
+                        onClicked: Quickshell.execDetached(["/home/sriyaan/.local/bin/sidera-connect-scrcpy"])
                     }
 
                     ToolRowItem {
