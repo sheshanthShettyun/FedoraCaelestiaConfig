@@ -21,7 +21,7 @@ Item {
     property string commandError
     property var devices: []
 
-    implicitWidth: 840
+    implicitWidth: Tokens.sizes.dashboard.mediaTabWidth
     implicitHeight: layout.implicitHeight
 
     Component.onCompleted: refresh()
