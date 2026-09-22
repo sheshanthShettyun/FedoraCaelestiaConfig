@@ -35,11 +35,12 @@ Item {
         id: layout
 
         anchors.fill: parent
-        spacing: Tokens.spacing.medium
+        spacing: Tokens.spacing.large
 
+        // Top Header
         StyledRect {
             Layout.fillWidth: true
-            implicitHeight: 92
+            implicitHeight: 84
             radius: Tokens.rounding.extraLarge
             color: Colours.tPalette.m3surfaceContainer
 
@@ -48,40 +49,25 @@ Item {
                 anchors.margins: Tokens.padding.large
                 spacing: Tokens.spacing.medium
 
-                MaterialIcon {
-                    text: "phonelink_ring"
-                    fontStyle: Tokens.font.icon.extraLarge
-                    color: Colours.palette.m3primary
-                    fill: root.available ? 1 : 0
-                }
-
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 0
+                    spacing: 2
 
                     StyledText {
                         Layout.fillWidth: true
                         text: qsTr("Connect")
-                        font: Tokens.font.title.small
+                        font: Tokens.font.title.large
                         color: Colours.palette.m3onSurface
                         elide: Text.ElideRight
                     }
 
                     StyledText {
                         Layout.fillWidth: true
-                        text: root.statusText
-                        font: Tokens.font.body.small
+                        text: qsTr("Manage and control your devices")
+                        font: Tokens.font.body.medium
                         color: Colours.palette.m3onSurfaceVariant
                         elide: Text.ElideRight
-                        animate: true
                     }
-                }
-
-                IconButton {
-                    type: IconButton.Tonal
-                    icon: "screen_share"
-                    isRound: true
-                    onClicked: Quickshell.execDetached(["scrcpy"])
                 }
 
                 IconButton {
@@ -90,6 +76,40 @@ Item {
                     isRound: true
                     disabled: root.loading
                     onClicked: root.refresh()
+                }
+
+                // Connection Status Dropdown Badge
+                StyledRect {
+                    implicitHeight: 38
+                    implicitWidth: statusRow.implicitWidth + Tokens.padding.medium * 2
+                    radius: Tokens.rounding.full
+                    color: Colours.tPalette.m3surfaceContainerHigh
+
+                    RowLayout {
+                        id: statusRow
+
+                        anchors.centerIn: parent
+                        spacing: Tokens.spacing.small
+
+                        StyledRect {
+                            implicitWidth: 8
+                            implicitHeight: 8
+                            radius: Tokens.rounding.full
+                            color: root.available ? "#4CAF50" : Colours.palette.m3error
+                        }
+
+                        StyledText {
+                            text: root.available ? qsTr("Connected") : qsTr("Disconnected")
+                            font: Tokens.font.body.medium
+                            color: Colours.palette.m3onSurface
+                        }
+
+                        MaterialIcon {
+                            text: "arrow_drop_down"
+                            fontStyle: Tokens.font.icon.small
+                            color: Colours.palette.m3onSurfaceVariant
+                        }
+                    }
                 }
             }
         }
@@ -161,11 +181,9 @@ Item {
     Component {
         id: devicesComponent
 
-        GridLayout {
+        ColumnLayout {
             Layout.fillWidth: true
-            columns: 2
-            rowSpacing: Tokens.spacing.medium
-            columnSpacing: Tokens.spacing.medium
+            spacing: Tokens.spacing.large
 
             Repeater {
                 model: root.devices
@@ -174,7 +192,6 @@ Item {
                     required property var modelData
 
                     Layout.fillWidth: true
-                    Layout.preferredWidth: 1
                     deviceId: modelData.id
                     deviceName: modelData.name
                 }
@@ -269,13 +286,6 @@ Item {
         Quickshell.execDetached(["kdeconnect-cli", "--device", deviceId, action]);
     }
 
-    function runDeviceArgs(deviceId: string, args: list<string>): void {
-        if (!deviceId)
-            return;
-
-        Quickshell.execDetached(["kdeconnect-cli", "--device", deviceId, ...args]);
-    }
-
     function openDeviceSettings(deviceId: string): void {
         if (deviceId)
             Quickshell.execDetached(["kdeconnect-app", "--device", deviceId]);
@@ -297,201 +307,396 @@ Item {
         daemonRefreshTimer.restart();
     }
 
-    component DeviceCard: StyledRect {
+    component DeviceCard: ColumnLayout {
         id: card
 
         property string deviceId
         property string deviceName
 
-        implicitHeight: cardLayout.implicitHeight + Tokens.padding.medium * 2
-        radius: Tokens.rounding.large
-        color: Colours.tPalette.m3surfaceContainer
+        spacing: Tokens.spacing.large
 
-        ColumnLayout {
-            id: cardLayout
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.margins: Tokens.padding.medium
-            spacing: Tokens.spacing.medium
+        // Top Device Info Box
+        StyledRect {
+            Layout.fillWidth: true
+            implicitHeight: mainCardLayout.implicitHeight + Tokens.padding.large * 2
+            radius: Tokens.rounding.extraLarge
+            color: Colours.tPalette.m3surfaceContainer
 
             RowLayout {
-                Layout.fillWidth: true
-                spacing: Tokens.spacing.medium
+                id: mainCardLayout
 
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.margins: Tokens.padding.large
+                spacing: Tokens.spacing.large
+
+                // Left Phone Frame
                 StyledRect {
-                    implicitWidth: 46
-                    implicitHeight: 46
-                    radius: Tokens.rounding.full
-                    color: Colours.palette.m3primaryContainer
+                    implicitWidth: 100
+                    implicitHeight: 160
+                    radius: Tokens.rounding.large
+                    color: Colours.tPalette.m3surfaceContainerHigh
+                    border.width: 1
+                    border.color: Colours.palette.m3outlineVariant
 
-                    MaterialIcon {
+                    ColumnLayout {
                         anchors.centerIn: parent
-                        text: "smartphone"
-                        fontStyle: Tokens.font.icon.large
-                        color: Colours.palette.m3onPrimaryContainer
+                        spacing: Tokens.spacing.small
+
+                        MaterialIcon {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "smartphone"
+                            fontStyle: Tokens.font.icon.extraLarge
+                            color: Colours.palette.m3primary
+                        }
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: qsTr("Device\nImage")
+                            font: Tokens.font.body.small
+                            color: Colours.palette.m3onSurfaceVariant
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                     }
                 }
 
+                // Right Device Info + Actions
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 0
+                    spacing: Tokens.spacing.medium
 
-                    StyledText {
+                    // Name + OS + Options Row
+                    RowLayout {
                         Layout.fillWidth: true
-                        text: card.deviceName
-                        font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
-                        color: Colours.palette.m3onSurface
-                        elide: Text.ElideRight
+                        spacing: Tokens.spacing.small
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 2
+
+                            RowLayout {
+                                spacing: Tokens.spacing.small
+
+                                StyledText {
+                                    text: card.deviceName
+                                    font: Tokens.font.title.medium
+                                    color: Colours.palette.m3onSurface
+                                }
+
+                                MaterialIcon {
+                                    text: "edit"
+                                    fontStyle: Tokens.font.icon.small
+                                    color: Colours.palette.m3onSurfaceVariant
+                                }
+                            }
+
+                            StyledText {
+                                text: qsTr("Android 14 • OxygenOS 14")
+                                font: Tokens.font.body.small
+                                color: Colours.palette.m3onSurfaceVariant
+                            }
+                        }
+
+                        IconButton {
+                            type: IconButton.Tonal
+                            icon: "more_vert"
+                            isRound: true
+                            onClicked: root.openDeviceSettings(card.deviceId)
+                        }
                     }
 
-                    StyledText {
+                    // 3 Status Cards Row
+                    RowLayout {
                         Layout.fillWidth: true
-                        text: qsTr("Reachable")
-                        font: Tokens.font.body.small
-                        color: Colours.palette.m3onSurfaceVariant
+                        spacing: Tokens.spacing.medium
+
+                        StatusTile {
+                            icon: "battery_charging_full"
+                            title: qsTr("87%")
+                            subtext: qsTr("Charging")
+                        }
+
+                        StatusTile {
+                            icon: "wifi"
+                            title: qsTr("Wi-Fi")
+                            subtext: qsTr("192.168.0.103")
+                        }
+
+                        StatusTile {
+                            icon: "phonelink_ring"
+                            title: qsTr("KDE Connect")
+                            subtext: qsTr("Paired")
+                        }
+                    }
+
+                    // Primary Actions Row
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Tokens.spacing.medium
+
+                        IconTextButton {
+                            Layout.fillWidth: true
+                            type: IconTextButton.Tonal
+                            icon: "link_off"
+                            text: qsTr("Unpair")
+                            onClicked: root.runDeviceAction(card.deviceId, "--unpair")
+                        }
+
+                        IconTextButton {
+                            Layout.fillWidth: true
+                            type: IconTextButton.Tonal
+                            icon: "send"
+                            text: qsTr("Send Ping")
+                            onClicked: root.runDeviceAction(card.deviceId, "--ping")
+                        }
+
+                        IconTextButton {
+                            Layout.fillWidth: true
+                            type: IconTextButton.Tonal
+                            icon: "extension"
+                            text: qsTr("Plugins")
+                            onClicked: root.openDeviceSettings(card.deviceId)
+                        }
                     }
                 }
             }
+        }
 
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Tokens.spacing.small
+        // Bottom 2-Column Section (Device Controls & Device Tools)
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Tokens.spacing.large
+            Layout.alignment: Qt.AlignTop
 
-                ActionButton {
-                    icon: "link_off"
-                    text: qsTr("Unpair")
-                    onClicked: root.runDeviceAction(card.deviceId, "--unpair")
-                }
-
-                ActionButton {
-                    icon: "outgoing_mail"
-                    text: qsTr("Send Ping")
-                    onClicked: root.runDeviceAction(card.deviceId, "--ping")
-                }
-
-                ActionButton {
-                    icon: "tune"
-                    text: qsTr("Plugins")
-                    onClicked: root.openDeviceSettings(card.deviceId)
-                }
-            }
-
+            // Left Column: Device Controls
             StyledRect {
                 Layout.fillWidth: true
-                implicitHeight: 1
-                color: Colours.palette.m3outlineVariant
+                Layout.preferredWidth: 1
+                Layout.alignment: Qt.AlignTop
+                implicitHeight: controlsLayout.implicitHeight + Tokens.padding.large * 2
+                radius: Tokens.rounding.extraLarge
+                color: Colours.tPalette.m3surfaceContainer
+
+                ColumnLayout {
+                    id: controlsLayout
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: Tokens.padding.large
+                    spacing: Tokens.spacing.medium
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+
+                        StyledText {
+                            text: qsTr("Device Controls")
+                            font: Tokens.font.title.small
+                            color: Colours.palette.m3onSurface
+                        }
+
+                        StyledText {
+                            text: qsTr("Quick access to common actions")
+                            font: Tokens.font.body.small
+                            color: Colours.palette.m3onSurfaceVariant
+                        }
+                    }
+
+                    ToolRowItem {
+                        icon: "play_circle"
+                        title: qsTr("Media")
+                        subtitle: qsTr("Control playback")
+                        onClicked: root.openDeviceSettings(card.deviceId)
+                    }
+
+                    ToolRowItem {
+                        icon: "keyboard_mouse"
+                        title: qsTr("Input")
+                        subtitle: qsTr("Keyboard & mouse")
+                        onClicked: root.openDeviceSettings(card.deviceId)
+                    }
+
+                    ToolRowItem {
+                        icon: "sms"
+                        title: qsTr("SMS")
+                        subtitle: qsTr("Send & manage messages")
+                        onClicked: root.openDeviceSettings(card.deviceId)
+                    }
+                }
             }
 
-            StyledText {
+            // Right Column: Device Tools
+            StyledRect {
                 Layout.fillWidth: true
-                text: qsTr("Controls")
-                font: Tokens.font.body.small
-                color: Colours.palette.m3onSurfaceVariant
-            }
+                Layout.preferredWidth: 1
+                Layout.alignment: Qt.AlignTop
+                implicitHeight: toolsLayout.implicitHeight + Tokens.padding.large * 2
+                radius: Tokens.rounding.extraLarge
+                color: Colours.tPalette.m3surfaceContainer
 
-            GridLayout {
-                Layout.fillWidth: true
-                columns: 3
-                rowSpacing: Tokens.spacing.small
-                columnSpacing: Tokens.spacing.small
+                ColumnLayout {
+                    id: toolsLayout
 
-                ActionButton {
-                    icon: "slideshow"
-                    text: qsTr("Media")
-                    onClicked: root.openDeviceSettings(card.deviceId)
-                }
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: Tokens.padding.large
+                    spacing: Tokens.spacing.medium
 
-                ActionButton {
-                    icon: "keyboard_mouse"
-                    text: qsTr("Input")
-                    onClicked: root.openDeviceSettings(card.deviceId)
-                }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
 
-                ActionButton {
-                    icon: "sms"
-                    text: qsTr("SMS")
-                    onClicked: root.openDeviceSettings(card.deviceId)
-                }
-            }
+                        StyledText {
+                            text: qsTr("Device Tools")
+                            font: Tokens.font.title.small
+                            color: Colours.palette.m3onSurface
+                        }
 
-            StyledText {
-                Layout.fillWidth: true
-                text: qsTr("Actions")
-                font: Tokens.font.body.small
-                color: Colours.palette.m3onSurfaceVariant
-            }
+                        StyledText {
+                            text: qsTr("Additional device features")
+                            font: Tokens.font.body.small
+                            color: Colours.palette.m3onSurfaceVariant
+                        }
+                    }
 
-            GridLayout {
-                Layout.fillWidth: true
-                columns: 3
-                rowSpacing: Tokens.spacing.small
-                columnSpacing: Tokens.spacing.small
+                    ToolRowItem {
+                        icon: "screencast"
+                        title: qsTr("Mirror")
+                        subtitle: qsTr("View and control your screen")
+                        onClicked: Quickshell.execDetached(["scrcpy"])
+                    }
 
-                ActionButton {
-                    icon: "screencast"
-                    text: qsTr("Mirror")
-                    onClicked: Quickshell.execDetached(["scrcpy"])
-                }
+                    ToolRowItem {
+                        icon: "folder_open"
+                        title: qsTr("Browse")
+                        subtitle: qsTr("Access files and folders")
+                        onClicked: root.browseDevice(card.deviceId)
+                    }
 
-                ActionButton {
-                    icon: "mobile_screen_share"
-                    text: qsTr("Screen Off")
-                    onClicked: Quickshell.execDetached(["scrcpy", "--turn-screen-off"])
-                }
+                    ToolRowItem {
+                        icon: "content_paste_go"
+                        title: qsTr("Clipboard")
+                        subtitle: qsTr("Sync clipboard between devices")
+                        onClicked: root.runDeviceAction(card.deviceId, "--send-clipboard")
+                    }
 
-                ActionButton {
-                    icon: "fullscreen"
-                    text: qsTr("Fullscreen")
-                    onClicked: Quickshell.execDetached(["scrcpy", "--fullscreen"])
-                }
-
-                ActionButton {
-                    icon: "search"
-                    text: qsTr("Find")
-                    onClicked: root.runDeviceAction(card.deviceId, "--ring")
-                }
-
-                ActionButton {
-                    icon: "content_paste_go"
-                    text: qsTr("Clipboard")
-                    onClicked: root.runDeviceAction(card.deviceId, "--send-clipboard")
-                }
-
-                ActionButton {
-                    icon: "folder_open"
-                    text: qsTr("Browse")
-                    onClicked: root.browseDevice(card.deviceId)
-                }
-
-                ActionButton {
-                    icon: "lock"
-                    text: qsTr("Lock")
-                    onClicked: root.runDeviceAction(card.deviceId, "--lock")
-                }
-
-                ActionButton {
-                    icon: "lock_open"
-                    text: qsTr("Unlock")
-                    onClicked: root.runDeviceAction(card.deviceId, "--unlock")
-                }
-
-                ActionButton {
-                    icon: "terminal"
-                    text: qsTr("Commands")
-                    onClicked: root.runDeviceAction(card.deviceId, "--list-commands")
+                    ToolRowItem {
+                        icon: "terminal"
+                        title: qsTr("Commands")
+                        subtitle: qsTr("Run device commands")
+                        onClicked: root.runDeviceAction(card.deviceId, "--list-commands")
+                    }
                 }
             }
         }
     }
 
-    component ActionButton: IconTextButton {
+    component StatusTile: StyledRect {
+        id: tile
+
+        required property string icon
+        required property string title
+        required property string subtext
+
         Layout.fillWidth: true
         Layout.preferredWidth: 1
-        type: IconTextButton.Tonal
-        font: Tokens.font.body.small
-        horizontalPadding: Tokens.padding.small
-        verticalPadding: Tokens.padding.small
+        implicitHeight: 56
+        radius: Tokens.rounding.medium
+        color: Colours.tPalette.m3surfaceContainerHigh
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: Tokens.padding.small
+            spacing: Tokens.spacing.small
+
+            MaterialIcon {
+                text: tile.icon
+                fontStyle: Tokens.font.icon.medium
+                color: Colours.palette.m3primary
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: tile.title
+                    font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
+                    color: Colours.palette.m3onSurface
+                    elide: Text.ElideRight
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: tile.subtext
+                    font: Tokens.font.body.small
+                    color: Colours.palette.m3onSurfaceVariant
+                    elide: Text.ElideRight
+                }
+            }
+        }
+    }
+
+    component ToolRowItem: ButtonBase {
+        id: item
+
+        required property string icon
+        required property string title
+        required property string subtitle
+
+        type: ButtonBase.Tonal
+        implicitWidth: 1
+        implicitHeight: 56
+        Layout.fillWidth: true
+
+        RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: Tokens.padding.medium
+            anchors.rightMargin: Tokens.padding.medium
+            spacing: Tokens.spacing.medium
+
+            StyledRect {
+                implicitWidth: 38
+                implicitHeight: 38
+                radius: Tokens.rounding.medium
+                color: Colours.tPalette.m3surfaceContainerHigh
+
+                MaterialIcon {
+                    anchors.centerIn: parent
+                    text: item.icon
+                    fontStyle: Tokens.font.icon.medium
+                    color: Colours.palette.m3primary
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: item.title
+                    font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
+                    color: Colours.palette.m3onSurface
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: item.subtitle
+                    font: Tokens.font.body.small
+                    color: Colours.palette.m3onSurfaceVariant
+                }
+            }
+
+            MaterialIcon {
+                text: "chevron_right"
+                fontStyle: Tokens.font.icon.medium
+                color: Colours.palette.m3onSurfaceVariant
+            }
+        }
     }
 }
