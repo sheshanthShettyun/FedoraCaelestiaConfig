@@ -329,13 +329,12 @@ Item {
         spacing: Tokens.spacing.large
         Layout.alignment: Qt.AlignTop
 
-        // Left Circular Orbit Hub Panel (Wider, no phone bezel frame)
+        // Left Circular Orbit Hub Panel (Width: 420px, height: 330px)
         StyledRect {
             id: hubRect
 
-            Layout.fillWidth: true
-            Layout.preferredWidth: 1.1
-            implicitHeight: 320
+            Layout.preferredWidth: 420
+            implicitHeight: 330
             radius: Tokens.rounding.extraExtraLarge
             color: Colours.tPalette.m3surfaceContainer
 
@@ -347,13 +346,13 @@ Item {
                 onPaint: {
                     const ctx = getContext("2d");
                     ctx.clearRect(0, 0, width, height);
-                    ctx.lineWidth = 2.5;
+                    ctx.lineWidth = 2;
                     ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.12);
 
                     const cx = width / 2;
-                    const cy = height / 2 - 10;
-                    const rx = width * 0.38;
-                    const ry = height * 0.38;
+                    const cy = height / 2 - 15;
+                    const rx = 135;
+                    const ry = 95;
 
                     ctx.beginPath();
                     ctx.ellipse(cx - rx, cy - ry, rx * 2, ry * 2);
@@ -361,13 +360,13 @@ Item {
                 }
             }
 
-            // Top Orbit Node: Battery (No "Charging" text)
+            // Top Orbit Node: Battery (Compact 87%)
             StyledRect {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
                 anchors.topMargin: 20
-                implicitHeight: 36
-                implicitWidth: battRow.implicitWidth + 20
+                implicitHeight: 34
+                implicitWidth: battRow.implicitWidth + 16
                 radius: Tokens.rounding.full
                 color: Colours.tPalette.m3surfaceContainerHigh
 
@@ -379,7 +378,7 @@ Item {
 
                     MaterialIcon {
                         text: "battery_full"
-                        fontStyle: Tokens.font.icon.medium
+                        fontStyle: Tokens.font.icon.small
                         color: Colours.palette.m3primary
                     }
 
@@ -395,29 +394,29 @@ Item {
             RowLayout {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: 16
-                anchors.rightMargin: 16
+                anchors.leftMargin: 24
+                anchors.rightMargin: 24
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: -10
-                spacing: 12
+                anchors.verticalCenterOffset: -15
+                spacing: 8
 
                 // Left Node: Wi-Fi
                 StyledRect {
-                    implicitHeight: 52
-                    implicitWidth: wifiColumn.implicitWidth + 20
-                    radius: Tokens.rounding.large
+                    implicitHeight: 48
+                    implicitWidth: wifiColumn.implicitWidth + 18
+                    radius: Tokens.rounding.medium
                     color: Colours.tPalette.m3surfaceContainerHigh
 
                     ColumnLayout {
                         id: wifiColumn
 
                         anchors.centerIn: parent
-                        spacing: 2
+                        spacing: 1
 
                         MaterialIcon {
                             Layout.alignment: Qt.AlignHCenter
                             text: "wifi"
-                            fontStyle: Tokens.font.icon.medium
+                            fontStyle: Tokens.font.icon.small
                             color: Colours.palette.m3primary
                         }
 
@@ -441,19 +440,17 @@ Item {
                     Layout.fillWidth: true
                 }
 
-                // Center Icon Node (Generic Device Circle)
+                // Center Phone Icon Node
                 StyledRect {
-                    implicitWidth: 72
-                    implicitHeight: 72
-                    radius: 36
+                    implicitWidth: 60
+                    implicitHeight: 60
+                    radius: 30
                     color: Colours.tPalette.m3surfaceContainerHigh
-                    border.width: 2
-                    border.color: Colours.palette.m3outlineVariant
 
                     MaterialIcon {
                         anchors.centerIn: parent
                         text: "smartphone"
-                        fontStyle: Tokens.font.icon.builders.extraLarge.scale(1.5).build()
+                        fontStyle: Tokens.font.icon.builders.large.scale(1.3).build()
                         color: Colours.palette.m3primary
                     }
                 }
@@ -464,27 +461,27 @@ Item {
 
                 // Right Node: KDE Connect
                 StyledRect {
-                    implicitHeight: 52
-                    implicitWidth: kdeColumn.implicitWidth + 20
-                    radius: Tokens.rounding.large
+                    implicitHeight: 48
+                    implicitWidth: kdeColumn.implicitWidth + 18
+                    radius: Tokens.rounding.medium
                     color: Colours.tPalette.m3surfaceContainerHigh
 
                     ColumnLayout {
                         id: kdeColumn
 
                         anchors.centerIn: parent
-                        spacing: 2
+                        spacing: 1
 
                         MaterialIcon {
                             Layout.alignment: Qt.AlignHCenter
                             text: "desktop_windows"
-                            fontStyle: Tokens.font.icon.medium
+                            fontStyle: Tokens.font.icon.small
                             color: Colours.palette.m3primary
                         }
 
                         StyledText {
                             Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("KDE Connect")
+                            text: qsTr("Connect")
                             font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
                             color: Colours.palette.m3onSurface
                         }
@@ -510,11 +507,11 @@ Item {
                 }
             }
 
-            // Bottom Device Name + OS
+            // Bottom Device Details: Name + Edit Icon + OS
             ColumnLayout {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 18
+                anchors.bottomMargin: 16
                 spacing: 2
 
                 RowLayout {
@@ -543,10 +540,10 @@ Item {
             }
         }
 
-        // Right Column: Action Buttons in a Wide 2-Column Grid
+        // Right Column: Action Buttons in a Spacious 2-Column Grid (Width: 550px)
         GridLayout {
             Layout.fillWidth: true
-            Layout.preferredWidth: 1.2
+            Layout.preferredWidth: 550
             columns: 2
             rowSpacing: 10
             columnSpacing: 10
@@ -614,7 +611,7 @@ Item {
 
         type: ButtonBase.Text
         implicitWidth: 1
-        implicitHeight: 58
+        implicitHeight: 56
         Layout.fillWidth: true
         radius: Tokens.rounding.large
 
@@ -631,9 +628,9 @@ Item {
 
                 // Organic Fluid Icon Container
                 StyledRect {
-                    implicitWidth: 42
-                    implicitHeight: 42
-                    radius: 21
+                    implicitWidth: 40
+                    implicitHeight: 40
+                    radius: 20
                     color: Colours.tPalette.m3surfaceContainerHigh
 
                     MaterialIcon {
