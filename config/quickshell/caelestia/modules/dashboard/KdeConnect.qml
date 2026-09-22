@@ -116,23 +116,18 @@ Item {
             }
         }
 
-        // 2. Main Middle Section: Orbit Hub (Left) + Action Pills List (Right)
+        // 2. Main Middle Section: Orbit Device Hub (Left) + 2-Column Action Buttons (Right)
         Loader {
             Layout.fillWidth: true
             sourceComponent: root.available && root.devices.length > 0 ? devicesComponent : unavailableComponent
         }
 
-        // 3. Bottom Row: System Performance Widgets
+        // 3. Bottom Row: Storage & Battery (Network Removed)
         RowLayout {
             Layout.fillWidth: true
             spacing: Tokens.spacing.medium
 
             StorageCard {
-                Layout.fillWidth: true
-                Layout.preferredWidth: 1
-            }
-
-            NetworkCard {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
             }
@@ -334,11 +329,13 @@ Item {
         spacing: Tokens.spacing.large
         Layout.alignment: Qt.AlignTop
 
-        // Left Orbit Hub Panel
+        // Left Circular Orbit Hub Panel (Wider, no phone bezel frame)
         StyledRect {
+            id: hubRect
+
             Layout.fillWidth: true
             Layout.preferredWidth: 1.1
-            Layout.fillHeight: true
+            implicitHeight: 320
             radius: Tokens.rounding.extraExtraLarge
             color: Colours.tPalette.m3surfaceContainer
 
@@ -350,13 +347,13 @@ Item {
                 onPaint: {
                     const ctx = getContext("2d");
                     ctx.clearRect(0, 0, width, height);
-                    ctx.lineWidth = 3;
+                    ctx.lineWidth = 2.5;
                     ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.12);
 
                     const cx = width / 2;
-                    const cy = height / 2 - 20;
-                    const rx = width * 0.40;
-                    const ry = height * 0.36;
+                    const cy = height / 2 - 10;
+                    const rx = width * 0.38;
+                    const ry = height * 0.38;
 
                     ctx.beginPath();
                     ctx.ellipse(cx - rx, cy - ry, rx * 2, ry * 2);
@@ -364,13 +361,13 @@ Item {
                 }
             }
 
-            // Orbit Node: Battery (Top)
+            // Top Orbit Node: Battery (No "Charging" text)
             StyledRect {
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: phoneBezel.top
-                anchors.bottomMargin: 24
-                implicitHeight: 44
-                implicitWidth: battRow.implicitWidth + 24
+                anchors.top: parent.top
+                anchors.topMargin: 20
+                implicitHeight: 36
+                implicitWidth: battRow.implicitWidth + 20
                 radius: Tokens.rounding.full
                 color: Colours.tPalette.m3surfaceContainerHigh
 
@@ -378,7 +375,7 @@ Item {
                     id: battRow
 
                     anchors.centerIn: parent
-                    spacing: 8
+                    spacing: 6
 
                     MaterialIcon {
                         text: "battery_full"
@@ -386,177 +383,138 @@ Item {
                         color: Colours.palette.m3primary
                     }
 
+                    StyledText {
+                        text: qsTr("87%")
+                        font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
+                        color: Colours.palette.m3onSurface
+                    }
+                }
+            }
+
+            // Middle Row: Wi-Fi (Left) + Center Icon + KDE Connect (Right)
+            RowLayout {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.leftMargin: 16
+                anchors.rightMargin: 16
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: -10
+                spacing: 12
+
+                // Left Node: Wi-Fi
+                StyledRect {
+                    implicitHeight: 52
+                    implicitWidth: wifiColumn.implicitWidth + 20
+                    radius: Tokens.rounding.large
+                    color: Colours.tPalette.m3surfaceContainerHigh
+
                     ColumnLayout {
-                        spacing: 0
+                        id: wifiColumn
+
+                        anchors.centerIn: parent
+                        spacing: 2
+
+                        MaterialIcon {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "wifi"
+                            fontStyle: Tokens.font.icon.medium
+                            color: Colours.palette.m3primary
+                        }
 
                         StyledText {
-                            text: qsTr("87%")
+                            Layout.alignment: Qt.AlignHCenter
+                            text: qsTr("Wi-Fi")
                             font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
                             color: Colours.palette.m3onSurface
                         }
 
                         StyledText {
-                            text: qsTr("Charging")
+                            Layout.alignment: Qt.AlignHCenter
+                            text: qsTr("192.168.0.104")
                             font: Tokens.font.body.small
                             color: Colours.palette.m3onSurfaceVariant
                         }
                     }
                 }
-            }
 
-            // Orbit Node: Wi-Fi (Left)
-            StyledRect {
-                anchors.right: phoneBezel.left
-                anchors.rightMargin: 16
-                anchors.verticalCenter: phoneBezel.verticalCenter
-                implicitHeight: 52
-                implicitWidth: wifiColumn.implicitWidth + 24
-                radius: Tokens.rounding.large
-                color: Colours.tPalette.m3surfaceContainerHigh
-
-                ColumnLayout {
-                    id: wifiColumn
-
-                    anchors.centerIn: parent
-                    spacing: 2
-
-                    MaterialIcon {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: "wifi"
-                        fontStyle: Tokens.font.icon.medium
-                        color: Colours.palette.m3primary
-                    }
-
-                    StyledText {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: qsTr("Wi-Fi")
-                        font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
-                        color: Colours.palette.m3onSurface
-                    }
-
-                    StyledText {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: qsTr("192.168.0.104")
-                        font: Tokens.font.body.small
-                        color: Colours.palette.m3onSurfaceVariant
-                    }
+                Item {
+                    Layout.fillWidth: true
                 }
-            }
 
-            // Orbit Node: KDE Connect (Right)
-            StyledRect {
-                anchors.left: phoneBezel.right
-                anchors.leftMargin: 16
-                anchors.verticalCenter: phoneBezel.verticalCenter
-                implicitHeight: 52
-                implicitWidth: kdeColumn.implicitWidth + 24
-                radius: Tokens.rounding.large
-                color: Colours.tPalette.m3surfaceContainerHigh
-
-                ColumnLayout {
-                    id: kdeColumn
-
-                    anchors.centerIn: parent
-                    spacing: 2
-
-                    MaterialIcon {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: "desktop_windows"
-                        fontStyle: Tokens.font.icon.medium
-                        color: Colours.palette.m3primary
-                    }
-
-                    StyledText {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: qsTr("KDE Connect")
-                        font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
-                        color: Colours.palette.m3onSurface
-                    }
-
-                    RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: 4
-
-                        StyledRect {
-                            implicitWidth: 6
-                            implicitHeight: 6
-                            radius: 3
-                            color: "#4CAF50"
-                        }
-
-                        StyledText {
-                            text: qsTr("Paired")
-                            font: Tokens.font.body.small
-                            color: Colours.palette.m3onSurfaceVariant
-                        }
-                    }
-                }
-            }
-
-            // Center Smartphone Graphic
-            StyledRect {
-                id: phoneBezel
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: -20
-                implicitWidth: 140
-                implicitHeight: 260
-                radius: 24
-                color: "#121216"
-                border.width: 2.5
-                border.color: Colours.palette.m3outlineVariant
-
-                StyledClippingRect {
-                    anchors.fill: parent
-                    anchors.margins: 4
-                    radius: 20
-                    color: "#1c1438"
-
-                    // Screen Gradient Background
-                    Rectangle {
-                        anchors.fill: parent
-                        gradient: Gradient {
-                            GradientStop {
-                                position: 0.0
-                                color: "#2d1b4e"
-                            }
-                            GradientStop {
-                                position: 0.5
-                                color: "#562d82"
-                            }
-                            GradientStop {
-                                position: 1.0
-                                color: "#0f0a22"
-                            }
-                        }
-                    }
-
-                    // Punchhole Camera
-                    StyledRect {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        anchors.topMargin: 8
-                        implicitWidth: 8
-                        implicitHeight: 8
-                        radius: 4
-                        color: "#000000"
-                    }
+                // Center Icon Node (Generic Device Circle)
+                StyledRect {
+                    implicitWidth: 72
+                    implicitHeight: 72
+                    radius: 36
+                    color: Colours.tPalette.m3surfaceContainerHigh
+                    border.width: 2
+                    border.color: Colours.palette.m3outlineVariant
 
                     MaterialIcon {
                         anchors.centerIn: parent
                         text: "smartphone"
-                        fontStyle: Tokens.font.icon.builders.extraLarge.scale(2.0).build()
+                        fontStyle: Tokens.font.icon.builders.extraLarge.scale(1.5).build()
                         color: Colours.palette.m3primary
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                // Right Node: KDE Connect
+                StyledRect {
+                    implicitHeight: 52
+                    implicitWidth: kdeColumn.implicitWidth + 20
+                    radius: Tokens.rounding.large
+                    color: Colours.tPalette.m3surfaceContainerHigh
+
+                    ColumnLayout {
+                        id: kdeColumn
+
+                        anchors.centerIn: parent
+                        spacing: 2
+
+                        MaterialIcon {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "desktop_windows"
+                            fontStyle: Tokens.font.icon.medium
+                            color: Colours.palette.m3primary
+                        }
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: qsTr("KDE Connect")
+                            font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
+                            color: Colours.palette.m3onSurface
+                        }
+
+                        RowLayout {
+                            Layout.alignment: Qt.AlignHCenter
+                            spacing: 4
+
+                            StyledRect {
+                                implicitWidth: 6
+                                implicitHeight: 6
+                                radius: 3
+                                color: "#4CAF50"
+                            }
+
+                            StyledText {
+                                text: qsTr("Paired")
+                                font: Tokens.font.body.small
+                                color: Colours.palette.m3onSurfaceVariant
+                            }
+                        }
                     }
                 }
             }
 
-            // Below Phone Details: Name + Edit Icon + OS
+            // Bottom Device Name + OS
             ColumnLayout {
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: phoneBezel.bottom
-                anchors.topMargin: 16
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 18
                 spacing: 2
 
                 RowLayout {
@@ -578,18 +536,20 @@ Item {
 
                 StyledText {
                     Layout.alignment: Qt.AlignHCenter
-                    text: qsTr("Android 13 • OxygenOS 13.1")
+                    text: qsTr("Android 14 • OxygenOS 14")
                     font: Tokens.font.body.small
                     color: Colours.palette.m3onSurfaceVariant
                 }
             }
         }
 
-        // Right Column: Organic Liquid-Blob Pill Action Items
-        ColumnLayout {
+        // Right Column: Action Buttons in a Wide 2-Column Grid
+        GridLayout {
             Layout.fillWidth: true
-            Layout.preferredWidth: 1
-            spacing: 10
+            Layout.preferredWidth: 1.2
+            columns: 2
+            rowSpacing: 10
+            columnSpacing: 10
 
             ActionPillItem {
                 icon: "play_arrow"
@@ -618,28 +578,28 @@ Item {
             ActionPillItem {
                 icon: "desktop_windows"
                 title: qsTr("Mirror")
-                subtitle: qsTr("View and control your screen")
+                subtitle: qsTr("Screen control")
                 onClicked: Quickshell.execDetached(["/home/sriyaan/.local/bin/sidera-connect-scrcpy"])
             }
 
             ActionPillItem {
                 icon: "folder"
                 title: qsTr("Browse")
-                subtitle: qsTr("Access files and folders")
+                subtitle: qsTr("Files & folders")
                 onClicked: root.browseDevice(card.deviceId)
             }
 
             ActionPillItem {
                 icon: "content_paste"
                 title: qsTr("Clipboard")
-                subtitle: qsTr("Sync clipboard between devices")
+                subtitle: qsTr("Sync clipboard")
                 onClicked: root.runDeviceAction(card.deviceId, "--send-clipboard")
             }
 
             ActionPillItem {
                 icon: "code"
                 title: qsTr("Commands")
-                subtitle: qsTr("Run device commands")
+                subtitle: qsTr("Remote commands")
                 onClicked: root.runDeviceAction(card.deviceId, "--list-commands")
             }
         }
@@ -654,26 +614,26 @@ Item {
 
         type: ButtonBase.Text
         implicitWidth: 1
-        implicitHeight: 62
+        implicitHeight: 58
         Layout.fillWidth: true
-        radius: Tokens.rounding.full
+        radius: Tokens.rounding.large
 
         StyledRect {
             anchors.fill: parent
-            radius: Tokens.rounding.full
+            radius: Tokens.rounding.large
             color: Colours.tPalette.m3surfaceContainer
 
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: 8
-                anchors.rightMargin: 20
-                spacing: Tokens.spacing.medium
+                anchors.rightMargin: 12
+                spacing: Tokens.spacing.small
 
-                // Organic Fluid Blob Container for Icon
+                // Organic Fluid Icon Container
                 StyledRect {
-                    implicitWidth: 46
-                    implicitHeight: 46
-                    radius: 23
+                    implicitWidth: 42
+                    implicitHeight: 42
+                    radius: 21
                     color: Colours.tPalette.m3surfaceContainerHigh
 
                     MaterialIcon {
@@ -693,6 +653,7 @@ Item {
                         text: item.title
                         font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
                         color: Colours.palette.m3onSurface
+                        elide: Text.ElideRight
                     }
 
                     StyledText {
@@ -700,6 +661,7 @@ Item {
                         text: item.subtitle
                         font: Tokens.font.body.small
                         color: Colours.palette.m3onSurfaceVariant
+                        elide: Text.ElideRight
                     }
                 }
 
