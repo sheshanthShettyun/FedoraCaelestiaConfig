@@ -116,7 +116,7 @@ Item {
             }
         }
 
-        // 2. Main Middle Section: Orbit Device Hub (Left) + 2-Column Action Buttons (Right)
+        // 2. Main Middle Section: Clean Device Hub (Left) + 2-Column Action Buttons (Right)
         Loader {
             Layout.fillWidth: true
             sourceComponent: root.available && root.devices.length > 0 ? devicesComponent : unavailableComponent
@@ -329,7 +329,7 @@ Item {
         spacing: Tokens.spacing.large
         Layout.alignment: Qt.AlignTop
 
-        // Left Circular Orbit Hub Panel (Width: 420px, height: 330px)
+        // Left Device Hub Panel (Matching screenshot layout exactly)
         StyledRect {
             id: hubRect
 
@@ -338,209 +338,179 @@ Item {
             radius: Tokens.rounding.extraExtraLarge
             color: Colours.tPalette.m3surfaceContainer
 
-            // Orbit Ring Canvas
-            Canvas {
-                id: orbitCanvas
-
-                anchors.fill: parent
-                onPaint: {
-                    const ctx = getContext("2d");
-                    ctx.clearRect(0, 0, width, height);
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.12);
-
-                    const cx = width / 2;
-                    const cy = height / 2 - 15;
-                    const rx = 135;
-                    const ry = 95;
-
-                    ctx.beginPath();
-                    ctx.ellipse(cx - rx, cy - ry, rx * 2, ry * 2);
-                    ctx.stroke();
-                }
-            }
-
-            // Top Orbit Node: Battery (Compact 87%)
-            StyledRect {
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: 20
-                implicitHeight: 34
-                implicitWidth: battRow.implicitWidth + 16
-                radius: Tokens.rounding.full
-                color: Colours.tPalette.m3surfaceContainerHigh
-
-                RowLayout {
-                    id: battRow
-
-                    anchors.centerIn: parent
-                    spacing: 6
-
-                    MaterialIcon {
-                        text: "battery_full"
-                        fontStyle: Tokens.font.icon.small
-                        color: Colours.palette.m3primary
-                    }
-
-                    StyledText {
-                        text: qsTr("87%")
-                        font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
-                        color: Colours.palette.m3onSurface
-                    }
-                }
-            }
-
-            // Middle Row: Wi-Fi (Left) + Center Icon + KDE Connect (Right)
-            RowLayout {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: 24
-                anchors.rightMargin: 24
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: -15
-                spacing: 8
-
-                // Left Node: Wi-Fi
-                StyledRect {
-                    implicitHeight: 48
-                    implicitWidth: wifiColumn.implicitWidth + 18
-                    radius: Tokens.rounding.medium
-                    color: Colours.tPalette.m3surfaceContainerHigh
-
-                    ColumnLayout {
-                        id: wifiColumn
-
-                        anchors.centerIn: parent
-                        spacing: 1
-
-                        MaterialIcon {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: "wifi"
-                            fontStyle: Tokens.font.icon.small
-                            color: Colours.palette.m3primary
-                        }
-
-                        StyledText {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("Wi-Fi")
-                            font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
-                            color: Colours.palette.m3onSurface
-                        }
-
-                        StyledText {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("192.168.0.104")
-                            font: Tokens.font.body.small
-                            color: Colours.palette.m3onSurfaceVariant
-                        }
-                    }
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                // Center Phone Icon Node
-                StyledRect {
-                    implicitWidth: 60
-                    implicitHeight: 60
-                    radius: 30
-                    color: Colours.tPalette.m3surfaceContainerHigh
-
-                    MaterialIcon {
-                        anchors.centerIn: parent
-                        text: "smartphone"
-                        fontStyle: Tokens.font.icon.builders.large.scale(1.3).build()
-                        color: Colours.palette.m3primary
-                    }
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                // Right Node: KDE Connect
-                StyledRect {
-                    implicitHeight: 48
-                    implicitWidth: kdeColumn.implicitWidth + 18
-                    radius: Tokens.rounding.medium
-                    color: Colours.tPalette.m3surfaceContainerHigh
-
-                    ColumnLayout {
-                        id: kdeColumn
-
-                        anchors.centerIn: parent
-                        spacing: 1
-
-                        MaterialIcon {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: "desktop_windows"
-                            fontStyle: Tokens.font.icon.small
-                            color: Colours.palette.m3primary
-                        }
-
-                        StyledText {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: qsTr("Connect")
-                            font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
-                            color: Colours.palette.m3onSurface
-                        }
-
-                        RowLayout {
-                            Layout.alignment: Qt.AlignHCenter
-                            spacing: 4
-
-                            StyledRect {
-                                implicitWidth: 6
-                                implicitHeight: 6
-                                radius: 3
-                                color: "#4CAF50"
-                            }
-
-                            StyledText {
-                                text: qsTr("Paired")
-                                font: Tokens.font.body.small
-                                color: Colours.palette.m3onSurfaceVariant
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Bottom Device Details: Name + Edit Icon + OS
             ColumnLayout {
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 16
-                spacing: 2
+                anchors.fill: parent
+                anchors.margins: Tokens.padding.large
+                spacing: Tokens.spacing.medium
 
-                RowLayout {
+                // 1. Top Title & OS Subtitle
+                ColumnLayout {
                     Layout.alignment: Qt.AlignHCenter
-                    spacing: 6
+                    spacing: 2
 
                     StyledText {
+                        Layout.alignment: Qt.AlignHCenter
                         text: card.deviceName
                         font: Tokens.font.title.medium
                         color: Colours.palette.m3onSurface
                     }
 
-                    MaterialIcon {
-                        text: "edit"
-                        fontStyle: Tokens.font.icon.small
+                    StyledText {
+                        Layout.alignment: Qt.AlignHCenter
+                        text: qsTr("Android 14 • OxygenOS 14")
+                        font: Tokens.font.body.small
                         color: Colours.palette.m3onSurfaceVariant
                     }
                 }
 
-                StyledText {
+                Item { Layout.fillHeight: true }
+
+                // 2. Middle Row: Wi-Fi Card + Center Circle Phone + KDE Connect Card
+                RowLayout {
                     Layout.alignment: Qt.AlignHCenter
-                    text: qsTr("Android 14 • OxygenOS 14")
-                    font: Tokens.font.body.small
-                    color: Colours.palette.m3onSurfaceVariant
+                    spacing: 12
+
+                    // Left Card: Wi-Fi
+                    StyledRect {
+                        implicitHeight: 110
+                        implicitWidth: 125
+                        radius: Tokens.rounding.extraLarge
+                        color: Colours.tPalette.m3surfaceContainerHigh
+
+                        ColumnLayout {
+                            anchors.centerIn: parent
+                            spacing: 4
+
+                            MaterialIcon {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: "wifi"
+                                fontStyle: Tokens.font.icon.large
+                                color: Colours.palette.m3onSurface
+                            }
+
+                            StyledText {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: qsTr("Wi-Fi")
+                                font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
+                                color: Colours.palette.m3onSurface
+                            }
+
+                            StyledText {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: qsTr("192.168.0.104")
+                                font: Tokens.font.body.small
+                                color: Colours.palette.m3onSurfaceVariant
+                            }
+                        }
+                    }
+
+                    // Center Circle Phone Node
+                    StyledRect {
+                        implicitWidth: 84
+                        implicitHeight: 84
+                        radius: 42
+                        color: "transparent"
+                        border.width: 1.5
+                        border.color: Colours.palette.m3outlineVariant
+
+                        MaterialIcon {
+                            anchors.centerIn: parent
+                            text: "smartphone"
+                            fontStyle: Tokens.font.icon.builders.extraLarge.scale(1.4).build()
+                            color: Colours.palette.m3onSurface
+                        }
+                    }
+
+                    // Right Card: KDE Connect
+                    StyledRect {
+                        implicitHeight: 110
+                        implicitWidth: 125
+                        radius: Tokens.rounding.extraLarge
+                        color: Colours.tPalette.m3surfaceContainerHigh
+
+                        ColumnLayout {
+                            anchors.centerIn: parent
+                            spacing: 4
+
+                            MaterialIcon {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: "desktop_windows"
+                                fontStyle: Tokens.font.icon.large
+                                color: Colours.palette.m3onSurface
+                            }
+
+                            StyledText {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: qsTr("KDE Connect")
+                                font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
+                                color: Colours.palette.m3onSurface
+                            }
+
+                            RowLayout {
+                                Layout.alignment: Qt.AlignHCenter
+                                spacing: 4
+
+                                StyledRect {
+                                    implicitWidth: 6
+                                    implicitHeight: 6
+                                    radius: 3
+                                    color: "#4CAF50"
+                                }
+
+                                StyledText {
+                                    text: qsTr("Paired")
+                                    font: Tokens.font.body.small
+                                    color: Colours.palette.m3onSurfaceVariant
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Item { Layout.fillHeight: true }
+
+                // 3. Bottom Row: Battery Pill + Edit Pencil Button
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 10
+
+                    StyledRect {
+                        implicitHeight: 38
+                        implicitWidth: battRow.implicitWidth + 24
+                        radius: Tokens.rounding.full
+                        color: Colours.tPalette.m3surfaceContainerHigh
+
+                        RowLayout {
+                            id: battRow
+
+                            anchors.centerIn: parent
+                            spacing: 6
+
+                            MaterialIcon {
+                                text: "battery_full"
+                                fontStyle: Tokens.font.icon.small
+                                color: Colours.palette.m3onSurface
+                            }
+
+                            StyledText {
+                                text: qsTr("87%")
+                                font: Tokens.font.body.builders.medium.weight(Font.DemiBold).build()
+                                color: Colours.palette.m3onSurface
+                            }
+                        }
+                    }
+
+                    IconButton {
+                        type: IconButton.Tonal
+                        icon: "edit"
+                        isRound: true
+                        onClicked: root.refresh()
+                    }
                 }
             }
         }
 
-        // Right Column: Action Buttons in a Spacious 2-Column Grid (Width: 550px)
+        // Right Column: Action Buttons in a Spacious 2-Column Grid
         GridLayout {
             Layout.fillWidth: true
             Layout.preferredWidth: 550
