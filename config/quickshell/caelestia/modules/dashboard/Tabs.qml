@@ -93,11 +93,15 @@ Item {
         }
 
         Behavior on x {
-            Anim {}
+            Anim {
+                duration: 400
+            }
         }
 
         Behavior on implicitWidth {
-            Anim {}
+            Anim {
+                duration: 400
+            }
         }
     }
 

@@ -53,7 +53,7 @@ Item {
                 component: connectComponent,
                 iconName: "devices",
                 text: qsTr("Connect"),
-                enabled: true
+                enabled: false // Connect tab hidden for now, re-enable when needed
             }
         ];
         return allTabs.filter(tab => tab.enabled);
@@ -97,6 +97,8 @@ Item {
             readonly property int currentIndex: root.screenState.dashboardTab
             readonly property Item currentItem: {
                 repeater.count; // Trigger update on count change
+                row.children.length; // and on delegate creation
+                row.implicitWidth; // and on async delegate sizing
                 return repeater.itemAt(currentIndex);
             }
 
@@ -147,6 +149,8 @@ Item {
 
                     delegate: Loader {
                         id: paneLoader
+
+                        asynchronous: true
 
                         required property int index
                         required property var modelData
@@ -206,20 +210,27 @@ Item {
 
                 KdeConnect {
                     screenState: root.screenState
+                    tabActive: view.currentIndex === root.dashboardTabs.findIndex(t => t.component === connectComponent)
                 }
             }
 
             Behavior on contentX {
-                Anim {}
+                Anim {
+                    duration: 240
+                }
             }
         }
     }
 
     Behavior on implicitWidth {
-        Anim {}
+        Anim {
+            duration: 220
+        }
     }
 
     Behavior on implicitHeight {
-        Anim {}
+        Anim {
+            duration: 220
+        }
     }
 }
